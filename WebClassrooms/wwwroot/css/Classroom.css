@@ -64,9 +64,17 @@
 
 .content {
     margin-left: 260px;
-    transition: margin-left 0.25s ease;
+    width: calc(100% - 260px);
 }
 
     .content.collapsed {
         margin-left: 75px !important;
+        width: calc(100% - 75px) !important;
     }
+
+.cover-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
