@@ -1,0 +1,28 @@
+﻿@model WebClassrooms.Models.Assignment
+@{
+    ViewData["Title"] = "Tạo bài tập";
+}
+
+<h3>Tạo bài tập</h3>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="ClassId" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" class="form-control" type="datetime-local" />
+    </div>
+    <button class="btn btn-primary">Tạo</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

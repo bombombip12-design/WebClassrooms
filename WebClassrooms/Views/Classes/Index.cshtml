@@ -1,0 +1,28 @@
+﻿@model IEnumerable<WebClassrooms.Models.Class>
+@{
+    ViewData["Title"] = "Danh sách lớp";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Danh sách lớp</h2>
+    <a class="btn btn-success" asp-action="Create">Tạo lớp mới</a>
+</div>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/default-cover.jpg" : item.CoverImageUrl)" class="card-img-top cover-img" alt="cover" />
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">@item.ClassName</h5>
+                    <p class="card-text text-truncate">@item.Description</p>
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                        <a class="btn btn-primary btn-sm" asp-action="Details" asp-route-id="@item.Id">Xem</a>
+                        <small class="text-muted">Người tạo: @item.Owner?.FullName</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

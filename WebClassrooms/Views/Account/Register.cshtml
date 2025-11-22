@@ -1,0 +1,25 @@
+﻿@model WebClassrooms.Models.ViewModels.RegisterVm
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+<h3>Đăng ký</h3>
+<form asp-action="Register" method="post">
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label"></label>
+        <input asp-for="FullName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" />
+    </div>
+    <button class="btn btn-success">Đăng ký</button>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

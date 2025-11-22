@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <img src="~/images/hero-class.jpg" class="card-img-top cover-img" alt="hero" />
+            <div class="card-body">
+                <h3 class="card-title">Chào mừng đến với hệ thống quản lý lớp học</h3>
+                <p class="card-text">Tạo lớp, giao bài tập, nộp bài và thảo luận — tất cả trong cùng một nơi.</p>
+                <a class="btn btn-primary" asp-controller="Classes" asp-action="Index">Xem lớp học</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="list-group mb-3">
+            <a class="list-group-item list-group-item-action" asp-controller="Classes" asp-action="Create">Tạo lớp mới</a>
+            <a class="list-group-item list-group-item-action" asp-controller="Assignments" asp-action="Create">Tạo bài tập</a>
+            <a class="list-group-item list-group-item-action" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Thông báo</h6>
+                <p class="card-text">Chưa có thông báo nào.</p>
+            </div>
+        </div>
+    </div>
+</div>

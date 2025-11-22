@@ -1,0 +1,72 @@
+﻿/* Sidebar */
+.sidebar {
+    width: 260px;
+    background: #f8f9fa;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 10px;
+    border-right: 1px solid #ddd;
+    transition: width 0.25s ease;
+    z-index: 2;
+}
+
+.sidebar-header {
+    font-size: 20px;
+    padding: 10px 15px;
+    position: relative;
+    z-index: 2;
+    text-align: left;
+}
+
+.sidebar-item {
+    display: block;
+    padding: 12px 20px;
+    color: #333;
+    font-size: 15px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+    .sidebar-item:hover {
+        background: #e8e8e8;
+    }
+
+    .sidebar-item.active {
+        background: #d6eaff;
+        color: #0d6efd;
+    }
+
+.sidebar-section-title {
+    margin-top: 15px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: #777;
+    text-transform: uppercase;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+}
+
+/* Collapsed sidebar chỉ ẩn menu, không ẩn header */
+.sidebar.collapsed {
+    width: 75px;
+}
+
+    .sidebar.collapsed #sidebarMenu {
+        display: none; /* ẩn menu khi collapsed */
+    }
+
+.content {
+    margin-left: 260px;
+    transition: margin-left 0.25s ease;
+}
+
+    .content.collapsed {
+        margin-left: 75px !important;
+    }
