@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Nộp bài";
+    var assignment = ViewBag.Assignment as FinalASB.Models.Assignment;
+    var assignmentId = ViewBag.AssignmentId as int? ?? 0;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="mb-4"><i class="fas fa-upload"></i> Nộp bài</h2>
+                <div class="mb-3">
+                    <h5>@assignment?.Title</h5>
+                    <p class="text-muted">@assignment?.Description</p>
+                    @if (assignment?.DueDate.HasValue == true)
+                    {
+                        <p><strong>Hạn nộp:</strong> @assignment.DueDate.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                    }
+                </div>
+                <form asp-action="Create" method="post">
+                    <input type="hidden" name="assignmentId" value="@assignmentId" />
+                    <div class="mb-3">
+                        <label for="driveFileId" class="form-label">ID File Google Drive</label>
+                        <input type="text" id="driveFileId" name="driveFileId" class="form-control" 
+                               placeholder="Nhập ID file từ Google Drive (tùy chọn)" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="driveFileUrl" class="form-label">URL File Google Drive</label>
+                        <input type="url" id="driveFileUrl" name="driveFileUrl" class="form-control" 
+                               placeholder="Nhập URL file từ Google Drive (tùy chọn)" />
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Lưu ý:</strong> Bạn có thể tải file lên Google Drive và dán link vào đây. 
+                        Hoặc để trống nếu chỉ nộp bài dạng văn bản.
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="javascript:history.back()" class="btn btn-secondary">Hủy</a>
+                        <button type="submit" class="btn btn-primary">Nộp bài</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

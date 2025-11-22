@@ -1,0 +1,194 @@
+@model FinalASB.Models.Class
+@using System.Security.Claims
+@{
+    ViewData["Title"] = Model.ClassName;
+    var userRole = ViewBag.UserRole as string ?? "Student";
+    var isOwner = ViewBag.IsOwner as bool? ?? false;
+    var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+}
+
+<div class="page-header">
+    <div>
+        <h1>@Model.ClassName</h1>
+        <p class="text-muted mb-0">
+            <i class="fas fa-user-tie me-1"></i>@Model.Owner.FullName
+            <span class="badge bg-primary ms-2">Mã lớp: @Model.JoinCode</span>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (userRole == "Teacher")
+        {
+            <a asp-controller="Assignments" asp-action="Create" asp-route-classId="@Model.Id" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Tạo bài tập</span>
+            </a>
+        }
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Announcements Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bullhorn me-2"></i>Thông báo</h5>
+            </div>
+            <div class="card-body">
+                @if (userRole == "Teacher")
+                {
+                    <form asp-controller="Announcements" asp-action="Create" method="post" class="mb-4">
+                        <input type="hidden" name="classId" value="@Model.Id" />
+                        <div class="input-group input-group-lg">
+                            <input type="text" name="content" class="form-control" placeholder="Viết thông báo cho lớp học..." required />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Đăng
+                            </button>
+                        </div>
+                    </form>
+                }
+                <div id="announcements">
+                    @if (!Model.Announcements.Any())
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="fas fa-comments fa-2x mb-2"></i>
+                            <p>Chưa có thông báo nào</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var announcement in Model.Announcements.OrderByDescending(a => a.CreatedAt))
+                        {
+                            <div class="border-start border-3 border-primary ps-3 mb-4 pb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <strong class="d-flex align-items-center">
+                                            <i class="fas fa-user-circle me-2 text-primary"></i>
+                                            @announcement.User.FullName
+                                        </strong>
+                                        <small class="text-muted ms-4">
+                                            <i class="fas fa-clock me-1"></i>@announcement.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                    @if (userRole == "Teacher" || announcement.UserId == currentUserId)
+                                    {
+                                        <form asp-controller="Announcements" asp-action="Delete" asp-route-id="@announcement.Id" method="post">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa thông báo này?');">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                                <p class="mb-0">@announcement.Content</p>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignments Section -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Bài tập</h5>
+            </div>
+            <div class="card-body">
+                @if (!Model.Assignments.Any())
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-clipboard-list fa-2x mb-2"></i>
+                        <p>Chưa có bài tập nào</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var assignment in Model.Assignments.OrderByDescending(a => a.CreatedAt))
+                        {
+                            <a asp-controller="Assignments" asp-action="Details" asp-route-id="@assignment.Id" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-file-alt me-2 text-primary"></i>@assignment.Title
+                                        </h6>
+                                        @if (assignment.DueDate.HasValue)
+                                        {
+                                            <small class="text-muted">
+                                                <i class="fas fa-calendar-times me-1"></i>
+                                                Hạn nộp: @assignment.DueDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                            </small>
+                                        }
+                                    </div>
+                                    <small class="text-muted">@assignment.CreatedAt.ToString("dd/MM/yyyy")</small>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Class Info -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Thông tin lớp học</h6>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="mb-3">@Model.Description</p>
+                    <hr />
+                }
+                <div class="mb-2">
+                    <i class="fas fa-user-tie me-2 text-primary"></i>
+                    <strong>Giáo viên:</strong> @Model.Owner.FullName
+                </div>
+                <div class="mb-2">
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    <strong>Học sinh:</strong> @Model.Enrollments.Count(e => e.Role == "Student")
+                </div>
+                <div>
+                    <i class="fas fa-user-tag me-2 text-primary"></i>
+                    <strong>Vai trò của bạn:</strong> 
+                    <span class="badge bg-info">@userRole</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Students List -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-users me-2"></i>Thành viên (@Model.Enrollments.Count)</h6>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <ul class="list-unstyled mb-0">
+                    @foreach (var enrollment in Model.Enrollments.OrderBy(e => e.Role).ThenBy(e => e.User.FullName))
+                    {
+                        <li class="mb-3 pb-2 border-bottom">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <i class="fas fa-user-circle me-2 text-primary"></i>
+                                    <strong>@enrollment.User.FullName</strong>
+                                </div>
+                                <span class="badge @(enrollment.Role == "Teacher" ? "bg-success" : "bg-secondary")">
+                                    @enrollment.Role
+                                </span>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-refresh announcements every 30 seconds
+        setInterval(function() {
+            location.reload();
+        }, 30000);
+    </script>
+}

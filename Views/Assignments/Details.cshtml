@@ -1,0 +1,225 @@
+@model FinalASB.Models.Assignment
+@{
+    ViewData["Title"] = Model.Title;
+    var userRole = ViewBag.UserRole as string ?? "Student";
+    var userId = ViewBag.UserId as int? ?? 0;
+    var userSubmission = ViewBag.UserSubmission as FinalASB.Models.Submission;
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Classes" asp-action="Details" asp-route-id="@Model.ClassId">@Model.Class.ClassName</a></li>
+        <li class="breadcrumb-item active">@Model.Title</li>
+    </ol>
+</nav>
+
+<div class="page-header">
+    <div>
+        <h1>@Model.Title</h1>
+        <p class="text-muted mb-0">
+            <i class="fas fa-chalkboard me-1"></i>Lớp: @Model.Class.ClassName
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (userRole == "Teacher")
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary">
+                <i class="fas fa-edit"></i>
+                <span>Chỉnh sửa</span>
+            </a>
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa bài tập này?');">
+                    <i class="fas fa-trash"></i>
+                    <span>Xóa</span>
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Mô tả</h5>
+                <p>@(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả" : Model.Description)</p>
+                
+                @if (Model.DueDate.HasValue)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-clock"></i> <strong>Hạn nộp:</strong> @Model.DueDate.Value.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                }
+
+                @if (Model.AssignmentFiles.Any())
+                {
+                    <h6 class="mt-4">Tệp đính kèm:</h6>
+                    <ul>
+                        @foreach (var file in Model.AssignmentFiles)
+                        {
+                            <li><a href="@file.DriveFileUrl" target="_blank">@file.DriveFileId</a></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+
+        @if (userRole == "Student")
+        {
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-upload"></i> Nộp bài</h5>
+                </div>
+                <div class="card-body">
+                    @if (userSubmission != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Đã nộp bài vào @userSubmission.SubmittedAt.ToString("dd/MM/yyyy HH:mm")
+                        </div>
+                        @if (userSubmission.SubmissionFiles.Any())
+                        {
+                            <h6>Tệp đã nộp:</h6>
+                            <ul>
+                                @foreach (var file in userSubmission.SubmissionFiles)
+                                {
+                                    <li><a href="@file.DriveFileUrl" target="_blank">@file.DriveFileId</a></li>
+                                }
+                            </ul>
+                        }
+                        @if (userSubmission.Score.HasValue)
+                        {
+                            <div class="mt-3">
+                                <strong>Điểm:</strong> @userSubmission.Score
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(userSubmission.TeacherComment))
+                        {
+                            <div class="mt-2">
+                                <strong>Nhận xét:</strong> @userSubmission.TeacherComment
+                            </div>
+                        }
+                        <a asp-controller="Submissions" asp-action="Create" asp-route-assignmentId="@Model.Id" class="btn btn-primary mt-3">
+                            <i class="fas fa-edit"></i> Cập nhật bài nộp
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Submissions" asp-action="Create" asp-route-assignmentId="@Model.Id" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Nộp bài
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+        else if (userRole == "Teacher")
+        {
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Danh sách bài nộp (@Model.Submissions.Count)</h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Submissions.Any())
+                    {
+                        <p class="text-muted">Chưa có học sinh nào nộp bài</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Học sinh</th>
+                                        <th>Thời gian nộp</th>
+                                        <th>Điểm</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var submission in Model.Submissions.OrderBy(s => s.Student.FullName))
+                                    {
+                                        <tr>
+                                            <td>@submission.Student.FullName</td>
+                                            <td>@submission.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                            <td>
+                                                @if (submission.Score.HasValue)
+                                                {
+                                                    <span class="badge bg-success">@submission.Score</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Chưa chấm</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-primary" 
+                                                        onclick="showGradeModal(@submission.Id, '@submission.Student.FullName', @(submission.Score?.ToString() ?? "null"), '@(submission.TeacherComment ?? "")')">
+                                                    <i class="fas fa-edit"></i> Chấm điểm
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Người tạo:</strong> @Model.Creator.FullName</p>
+                <p class="mb-2"><strong>Ngày tạo:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                <p class="mb-0"><strong>Số bài nộp:</strong> @Model.Submissions.Count</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grade Modal -->
+<div class="modal fade" id="gradeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chấm điểm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="gradeForm" method="post">
+                <div class="modal-body">
+                    <p><strong>Học sinh:</strong> <span id="studentName"></span></p>
+                    <div class="mb-3">
+                        <label for="score" class="form-label">Điểm</label>
+                        <input type="number" id="score" name="score" class="form-control" min="0" max="100" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="teacherComment" class="form-label">Nhận xét</label>
+                        <textarea id="teacherComment" name="teacherComment" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showGradeModal(submissionId, studentName, score, comment) {
+            document.getElementById('studentName').textContent = studentName;
+            document.getElementById('score').value = score || '';
+            document.getElementById('teacherComment').value = comment || '';
+            document.getElementById('gradeForm').action = '/Submissions/Grade?submissionId=' + submissionId;
+            new bootstrap.Modal(document.getElementById('gradeModal')).show();
+        }
+    </script>
+}
+

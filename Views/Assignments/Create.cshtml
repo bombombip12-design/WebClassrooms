@@ -1,0 +1,73 @@
+@model FinalASB.Models.Assignment
+@{
+    ViewData["Title"] = "Tạo bài tập";
+    var classId = ViewBag.ClassId as int? ?? 0;
+}
+
+<div class="page-header">
+    <div>
+        <h1><i class="fas fa-plus-circle me-2"></i>Tạo bài tập mới</h1>
+        <p class="text-muted mb-0">Tạo bài tập mới cho lớp học của bạn</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-md">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post" id="createAssignmentForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ClassId" value="@classId" />
+                    <input type="hidden" name="ClassId" value="@classId" />
+                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+                    <div class="mb-4">
+                        <label asp-for="Title" class="form-label">
+                            <i class="fas fa-heading me-2"></i>Tiêu đề <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Title" class="form-control form-control-lg" placeholder="Nhập tiêu đề bài tập" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Description" class="form-label">
+                            <i class="fas fa-align-left me-2"></i>Mô tả
+                        </label>
+                        <textarea asp-for="Description" class="form-control" rows="6" placeholder="Nhập mô tả chi tiết về bài tập"></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="DueDate" class="form-label">
+                            <i class="fas fa-calendar-times me-2"></i>Hạn nộp
+                        </label>
+                        <input asp-for="DueDate" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="DueDate" class="text-danger small"></span>
+                        <small class="text-muted">Để trống nếu không có hạn nộp</small>
+                    </div>
+                    <div class="d-flex justify-content-between gap-2">
+                        <a href="javascript:history.back()" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Hủy
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>Tạo bài tập
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            $('#createAssignmentForm').on('submit', function(e) {
+                var title = $('#Title').val();
+                if (!title || title.trim() === '') {
+                    e.preventDefault();
+                    alert('Vui lòng nhập tiêu đề bài tập');
+                    return false;
+                }
+            });
+        });
+    </script>
+}
