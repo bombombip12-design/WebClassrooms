@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ABC Classroom</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar" id="dashboardSidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-graduation-cap me-2"></i>ABC Classroom</h3>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="@Url.Action("Index", "Home")" class="sidebar-item active" data-section="home" data-filter="all">
+                <i class="fas fa-home"></i>
+                <span>Màn hình chính</span>
+            </a>
+            <a href="#" class="sidebar-item" data-section="teaching" data-filter="Teacher">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Giảng dạy</span>
+                <small class="sidebar-subtitle">Lớp học do bạn tạo</small>
+            </a>
+            <a href="#" class="sidebar-item" data-section="classes" data-filter="Student">
+                <i class="fas fa-users"></i>
+                <span>Lớp học</span>
+                <small class="sidebar-subtitle">Lớp học mà bạn đang tham gia</small>
+            </a>
+            <a href="#" class="sidebar-item" data-section="settings" data-filter="all">
+                <i class="fas fa-cog"></i>
+                <span>Cài đặt</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="dashboard-main-wrapper">
+        <!-- Top Bar -->
+        <header class="dashboard-topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h4 class="topbar-title">Lớp học</h4>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-actions dropdown">
+                    <button class="topbar-btn" id="addButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" id="addDropdown" aria-labelledby="addButton">
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Join", "Classes")">
+                                <i class="fas fa-sign-in-alt me-2"></i>Tham gia lớp học
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="@Url.Action("Create", "Classes")">
+                                <i class="fas fa-plus me-2"></i>Tạo lớp học
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="topbar-actions dropdown">
+                    <button class="topbar-btn avatar-btn" id="avatarButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="avatar-circle">
+                            @{
+                                var userName = User.Identity?.Name ?? "U";
+                                var initials = userName.Length > 0 ? userName.Substring(0, 1).ToUpper() : "U";
+                            }
+                            <span>@initials</span>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" id="avatarDropdown" aria-labelledby="avatarButton">
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <i class="fas fa-user me-2"></i>Xem hồ sơ
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="document.getElementById('logoutForm').submit();">
+                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-content">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show fade-in" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show fade-in" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Sidebar toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            const wrapper = document.querySelector('.dashboard-main-wrapper');
+            sidebar.classList.toggle('collapsed');
+            wrapper.classList.toggle('sidebar-collapsed');
+        });
+
+        // Initialize Bootstrap dropdowns
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dropdowns
+            const addButton = document.getElementById('addButton');
+            const avatarButton = document.getElementById('avatarButton');
+            
+            if (addButton) {
+                new bootstrap.Dropdown(addButton);
+            }
+            
+            if (avatarButton) {
+                new bootstrap.Dropdown(avatarButton);
+            }
+        });
+
+        // Sidebar filter functionality
+        document.querySelectorAll('.sidebar-item[data-filter]').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                if (this.getAttribute('data-section') === 'settings') {
+                    return; // Settings doesn't filter
+                }
+                
+                e.preventDefault();
+                
+                // Update active state
+                document.querySelectorAll('.sidebar-item').forEach(function(sidebarItem) {
+                    sidebarItem.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Filter classes
+                const filter = this.getAttribute('data-filter');
+                const classCards = document.querySelectorAll('.dashboard-class-card');
+                
+                classCards.forEach(function(card) {
+                    if (filter === 'all') {
+                        card.style.display = 'block';
+                    } else {
+                        const role = card.getAttribute('data-role');
+                        if (role === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

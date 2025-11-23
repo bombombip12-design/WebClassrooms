@@ -3,48 +3,47 @@
     ViewData["Title"] = "Đăng nhập";
 }
 
-<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="col-md-5 col-lg-4">
-        <div class="card shadow-lg">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <div class="mb-3">
-                        <i class="fas fa-graduation-cap" style="font-size: 3rem; color: var(--primary-color);"></i>
+<div class="glassy-auth-container">
+    <div class="glassy-form-wrapper">
+        <div class="glassy-form">
+            <div class="text-center mb-4">
+                <h2 class="glassy-title mb-2">Đăng nhập</h2>
+                <p class="glassy-subtitle">Điền thông tin bên dưới để đăng nhập</p>
+            </div>
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 validation-summary" style="display: none;"></div>
+                <div class="glassy-input-group mb-3">
+                    <label asp-for="Email" class="glassy-label">Email</label>
+                    <div class="glassy-input-wrapper">
+                        <input asp-for="Email" class="glassy-input" placeholder="Nhập email của bạn" />
+                        <i class="fas fa-user glassy-input-icon"></i>
                     </div>
-                    <h2 class="mb-2">Đăng nhập</h2>
-                    <p class="text-muted">Chào mừng bạn trở lại!</p>
+                    <span asp-validation-for="Email" class="text-danger small d-block mt-1"></span>
                 </div>
-                <form asp-action="Login" method="post">
-                    <div asp-validation-summary="All" class="alert alert-danger"></div>
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">
-                            <i class="fas fa-envelope me-2"></i>Email
-                        </label>
-                        <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn" />
-                        <span asp-validation-for="Email" class="text-danger small"></span>
+                <div class="glassy-input-group mb-3">
+                    <label asp-for="Password" class="glassy-label">Mật khẩu</label>
+                    <div class="glassy-input-wrapper">
+                        <input asp-for="Password" class="glassy-input" placeholder="Nhập mật khẩu" />
+                        <i class="fas fa-lock glassy-input-icon"></i>
                     </div>
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">
-                            <i class="fas fa-lock me-2"></i>Mật khẩu
-                        </label>
-                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
-                        <span asp-validation-for="Password" class="text-danger small"></span>
-                    </div>
-                    <div class="mb-4 form-check">
-                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
-                        <label asp-for="RememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
-                    </div>
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
-                        </button>
-                    </div>
-                </form>
-                <div class="text-center mt-4 pt-3 border-top">
-                    <p class="text-muted mb-0">Chưa có tài khoản? 
-                        <a asp-action="Register" class="text-decoration-none fw-bold">Đăng ký ngay</a>
-                    </p>
+                    <span asp-validation-for="Password" class="text-danger small d-block mt-1"></span>
                 </div>
+                <div class="glassy-options mb-4">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberMe" />
+                        <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                </div>
+                <div class="d-grid mb-3">
+                    <button type="submit" class="glassy-btn">
+                        Đăng nhập
+                    </button>
+                </div>
+            </form>
+            <div class="text-center mt-4 pt-3 glassy-footer">
+                <p class="mb-0">Chưa có tài khoản? 
+                    <a asp-action="Register" class="glassy-link">Đăng ký ngay</a>
+                </p>
             </div>
         </div>
     </div>
@@ -52,4 +51,27 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Chỉ hiển thị validation summary khi có lỗi
+        document.addEventListener('DOMContentLoaded', function() {
+            const validationSummary = document.querySelector('.validation-summary');
+            if (validationSummary) {
+                // Kiểm tra xem có lỗi không (có text hoặc có thẻ ul với li)
+                const hasErrors = validationSummary.textContent.trim().length > 0 || 
+                                 validationSummary.querySelector('ul li');
+                if (hasErrors) {
+                    validationSummary.style.display = 'block';
+                } else {
+                    validationSummary.style.display = 'none';
+                }
+            }
+            
+            // Ẩn các thông báo lỗi trống
+            document.querySelectorAll('span.field-validation-error').forEach(function(span) {
+                if (!span.textContent.trim()) {
+                    span.style.display = 'none';
+                }
+            });
+        });
+    </script>
 }
